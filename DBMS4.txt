@@ -1,0 +1,89 @@
+use ass4
+
+db.createCollection("sales");
+
+db.sales.insertOne({product_id:101,category:'stationary',name:'pen',quantity:100,amount:100});
+
+db.sales.insertOne({product_id:102,category:'stationary',name:'pencil',quantity:110,amount:1000});
+
+db.sales.insertOne({product_id:103,category:'stationary',name:'scale',quantity:120,amount:1200});
+
+db.sales.insertOne({product_id:104,category:'stationary',name:'eraser',quantity:90,amount:900});
+
+db.sales.insertOne({product_id:105,category:'furniture',name:'table',quantity:50,amount:12000});
+
+db.sales.insertOne({product_id:106,category:'furniture',name:'chair',quantity:55,amount:55000});
+
+db.sales.insertOne({product_id:107,category:'furniture',name:'sofa',quantity:65,amount:13200});
+
+db.sales.insertOne({product_id:108,category:'furniture',name:'cupboard',quantity:77,amount:20012});
+
+db.sales.insertOne({product_id:109,category:'Electronic',name:'TV',quantity:25,amount:200000});
+
+db.sales.insertOne({product_id:110,category:'Electronic',name:'fridge',quantity:20,amount:328100});
+
+db.sales.insertOne({product_id:111,category:'Electronic',name:'fridge',quantity:20,amount:328100});
+
+db.sales.remove({'product_id':'111'});
+
+db.sales.insertOne({product_id:111,category:'Electronic',name:'washing machine',quantity:22,amount:324100});
+
+db.sales.insertOne({product_id:112,category:'Electronic',name:'mobile',quantity:32,amount:12500});
+
+db.sales.find();
+
+db.sales.aggregate([ { $group:{ _id:"$category",avgamount:{$avg:"$amount"}}} ]);
+{ "_id" : "Electronic", "avgamount" : 216175 }
+{ "_id" : "furniture", "avgamount" : 25053 }
+{ "_id" : "stationary", "avgamount" : 800 }
+> 
+
+db.sales.aggregate([ { $group:{ _id:"$category",avgamount:{$sum:"$amount"}}} ]);
+{ "_id" : "Electronic", "avgamount" : 864700 }
+{ "_id" : "furniture", "avgamount" : 100212 }
+{ "_id" : "stationary", "avgamount" : 3200 }
+
+db.sales.aggregate([ { $group:{ _id:"$category",avgamount:{$max:"$amount"}}} ]);
+{ "_id" : "Electronic", "avgamount" : 328100 }
+{ "_id" : "furniture", "avgamount" : 55000 }
+{ "_id" : "stationary", "avgamount" : 1200 }
+
+db.sales.aggregate([ { $group:{ _id:"$category",avgamount:{$min:"$amount"}}} ]);
+{ "_id" : "Electronic", "avgamount" : 12500 }
+{ "_id" : "furniture", "avgamount" : 12000 }
+{ "_id" : "stationary", "avgamount" : 100 }
+
+
+db.sales.aggregate([ { $sort: {amount:-1} }, { $limit:10} ]);
+
+ 
+db.sales.aggregate([ { $sort: {amount:-1} }, { $limit:5} ]);
+
+
+db.sales.aggregate([ { $sort: {amount:1} }, { $limit:5} ]);
+
+db.sales.createIndex({product_id:1});
+
+db.sales.find({product_id:101});
+
+var mapFunction=function() {
+... emit (this.category,this.amount);};
+
+> var reduceFunction=function(key,values){
+... return Array.sum(values);};
+
+
+db.sales.mapReduce(mapFunction,reduceFunction, { out:"category_wise_total_amount"});
+{
+	"result" : "category_wise_total_amount",
+	"timeMillis" : 43,
+	"counts" : {
+		"input" : 12,
+		"emit" : 12,
+		"reduce" : 3,
+		"output" : 3
+	},
+	"ok" : 1
+}
+> 
+
