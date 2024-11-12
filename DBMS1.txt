@@ -1,0 +1,63 @@
+CREATE DATABASE university_db;
+
+USE university_db;
+
+CREATE TABLE professors (
+	professor_id INT AUTO_INCREMENT PRIMARY KEY,
+	professor_name VARCHAR(100) NOT NULL,
+	department VARCHAR(50) NOT NULL,
+	salary DECIMAL(10, 2));
+    
+CREATE INDEX idx_professor_name ON professors (professor_name);
+
+ALTER TABLE professors
+ADD CONSTRAINT uc_professor_name_department UNIQUE
+(professor_name, department);
+
+ALTER TABLE professors
+ADD CONSTRAINT chk_salary_positive CHECK (salary >= 0);
+
+CREATE VIEW professor_details AS
+SELECT professor_name, department, salary
+FROM professors;
+
+INSERT INTO professors (professor_name, department, salary)
+VALUES
+    ('John Doe', 'Mathematics', 125000),
+    ('Alice Smith', 'Computer Science', 145000),
+    ('Bob Johnson', 'Physics', 132000),
+    ('Alex Brown', 'Computer Science', 168000),
+    ('Sarah Adams', 'Biology', 118000),
+    ('Michael White', 'Computer Science', 156000),
+    ('David Lee', 'Chemistry', 139000);
+    
+   # -- Queries -- #
+    
+SELECT department FROM professors WHERE professor_name = 'ABC';
+
+SELECT professor_name FROM professors WHERE professor_name LIKE 'A%';
+
+SELECT professor_name FROM professors WHERE department = 'Computer Science';
+
+SELECT DISTINCT department FROM professors;
+
+SELECT COUNT(*) AS num_professors FROM professors WHERE salary > 150000;
+
+SELECT department, SUM(salary) AS aggregate_salary FROM professors GROUP BY department;
+
+SELECT professor_name, salary FROM professors ORDER BY salary DESC LIMIT 1;
+
+SELECT professor_name, salary
+FROM professors
+WHERE department = 'Computer Science'
+ORDER BY salary DESC
+LIMIT 1;
+
+SELECT professor_name, salary
+FROM professors
+ORDER BY salary DESC
+LIMIT 5;
+
+SELECT COUNT(DISTINCT department) AS num_unique_departments FROM professors;
+
+SELECT * FROM professors
